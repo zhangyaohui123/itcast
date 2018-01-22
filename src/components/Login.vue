@@ -1,17 +1,16 @@
 <template>
   <div class="info">
     <div class="avatar">
-      <img src="../assets/longmao.jpg">
+      <img src="../assets/logo.png">
     </div>
-    <!-- 表单 -->
     <!-- ref表示组件名称，用于直接操作DOM -->
     <el-form ref="loginForm" :rules="rules" :model="form" class='container'>
       <div class="userInfo">
-        <el-form-item prop="username">
-          <el-input v-model="form.username" prefix-icon="myicon myicon-user"></el-input>
+        <el-form-item prop='username'>
+          <el-input prefix-icon="myicon myicon-user" v-model="form.username"></el-input>
         </el-form-item>
-        <el-form-item prop="password">
-          <el-input prefix-icon="myicon myicon-key" v-model="form.password" type='password'></el-input>
+        <el-form-item prop='password'>
+          <el-input prefix-icon="myicon myicon-key" type='password' v-model="form.password"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click='login'>登录</el-button>
@@ -53,7 +52,6 @@ export default {
           }
           // 调用接口，提交用户登录信息
           login(params).then(res => {
-            console.log(res)
             if (res.meta.status === 200) {
               // 存储token
               localStorage.setItem('mytoken', res.data.token)
@@ -114,5 +112,11 @@ export default {
   }
   .btn {
     width: 400px;
+  }
+  /*.el-form-item {
+    color: blue;
+  }*/
+  .el-form-item__error {
+    color: blue;
   }
 </style>
