@@ -32,7 +32,7 @@
             <i class="el-icon-menu"></i>
             <span slot="title">角色列表</span>
           </el-menu-item>
-          <el-menu-item index="/auth">
+          <el-menu-item index="/rights">
             <i class="el-icon-menu"></i>
             <span slot="title">权限列表</span>
           </el-menu-item>
@@ -161,8 +161,8 @@ export default {
     background-color: #545c64;
   }
   .logo {
-    height:60px;
-    background: url(../assets/logo.png);
+    height:80px;
+    background: url(../assets/longmao.jpg);
     background-size: cover;
     background-color: #989898;
   }
