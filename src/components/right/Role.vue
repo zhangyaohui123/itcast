@@ -99,7 +99,7 @@
   </div>
 </template>
 <script>
-import {roleList, addRole, getRoleById, editRole, deleteRole} from '../../api/api.js'
+import {roleList, addRole, getRoleById, editRole, deleteRole, deleteRoleRight} from '../../api/api.js'
 
 export default {
   data () {
@@ -127,6 +127,14 @@ export default {
     }
   },
   methods: {
+    deleteRight (row, rightId) {
+      deleteRoleRight({roleId: row.id, rightId: rightId}).then(res => {
+        if (res.meta.status === 200) {
+          // 删除成功，把数据重新赋值
+          row.children = res.data
+        }
+      })
+    },
     deleteHandler (row) {
       // console.log(row)
       this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
