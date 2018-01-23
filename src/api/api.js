@@ -70,3 +70,27 @@ export const roleList = (params) => {
     return res.data
   })
 }
+// 权限管理-添加角色
+export const addRole = (params) => {
+  return axios.post('roles', params).then(res => {
+    return res.data
+  })
+}
+// 权限管理-根据id查询角色信息
+export const getRoleById = (params) => {
+  return axios.get('roles/' + params.id).then(res => {
+    return res.data
+  })
+}
+// 权限管理-编辑角色
+export const editRole = (params) => {
+  return axios.put('roles/' + params.id, params).then(res => {
+    return res.data
+  })
+}
+// 权限管理-删除角色
+export const deleteRole = (params) => {
+  return axios.delete('roles/' + params.id).then(res => {
+    return res.data
+  })
+}

@@ -170,7 +170,7 @@ export default {
           if (res.meta.status === 200) {
             this.$message({
               type: 'success',
-              message: '删除成功!'
+              message: res.meta.msg
             })
             // 刷新列表
             this.initList()
