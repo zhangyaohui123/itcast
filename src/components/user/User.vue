@@ -154,6 +154,7 @@ export default {
     }
   },
   methods: {
+    // 搜索框
     queryHandler () {
       this.initList()
     },
@@ -182,6 +183,7 @@ export default {
         })
       })
     },
+    // 将数据展示到页面上
     editHandler (row) {
       // console.log(row.id) // 测试代码
       // 因为页面可能随时更新数据，所有重新请求一次数据，相对来说是新数据
