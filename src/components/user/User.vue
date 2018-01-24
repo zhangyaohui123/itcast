@@ -23,7 +23,7 @@
       <el-table-column
         prop="username"
         label="姓名"
-        width="180">
+        width="160">
       </el-table-column>
       <el-table-column
         prop="email"
@@ -36,8 +36,13 @@
         label="电话">
       </el-table-column>
       <el-table-column
-        prop="mg_state"
+        prop="role_name"
         width="180"
+        label="角色">
+      </el-table-column>
+      <el-table-column
+        prop="mg_state"
+        width="80"
         label="用户状态">
         <template slot-scope="scope">
           <!-- 作用域插槽，可以定制数据显示 -->
@@ -117,7 +122,7 @@
       :visible="dialogVisible4Role"
       width="50%">
       <div><span>当前用户名 : </span><span>{{currentUser.username}}</span></div>
-      <el-select v-model="currentRole" placeholder="请选择">
+      <span>请选择角色 : </span><el-select v-model="currentRole" placeholder="请选择">
         <el-option
           v-for="item in roleList"
           :key="item.id"
@@ -133,7 +138,7 @@
   </div>
 </template>
 <script>
-import {getUsersData, toggleUserState, addUser, getUserById, editUser, deleteUser} from '../../api/api.js'
+import {giveRole, roleList, getUsersData, toggleUserState, addUser, getUserById, editUser, deleteUser} from '../../api/api.js'
 export default {
   data () {
     return {
@@ -178,12 +183,32 @@ export default {
     }
   },
   methods: {
+    submitUser4Role () {
+      // console.log(this.currentRole)
+      giveRole({id: this.currentUser.id, rid: this.currentRole}).then(res => {
+        if (res.meta.status === 200) {
+          // 隐藏弹窗
+          this.dialogVisible4Role = false
+          // 提示
+          this.$message({
+            type: 'success',
+            message: res.meta.msg
+          })
+        }
+      })
+    },
     giveUserRole (row) {
       // 设置当前用户
       this.currentUser = row
       // 初始化下拉选项数据
+      roleList().then(res => {
+        if (res.meta.status === 200) {
+          this.roleList = res.data
+        }
+      })
       this.dialogVisible4Role = true
     },
+    // 搜索框
     queryHandler () {
       this.initList()
     },
@@ -199,7 +224,7 @@ export default {
           if (res.meta.status === 200) {
             this.$message({
               type: 'success',
-              message: '删除成功!'
+              message: res.meta.msg
             })
             // 刷新列表
             this.initList()
@@ -212,6 +237,7 @@ export default {
         })
       })
     },
+    // 将数据展示到页面上
     editHandler (row) {
       // console.log(row.id) // 测试代码
       // 因为页面可能随时更新数据，所有重新请求一次数据，相对来说是新数据

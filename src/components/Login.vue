@@ -1,7 +1,7 @@
 <template>
   <div class="info">
     <div class="avatar">
-      <img src="../assets/logo.png">
+      <img src="../assets/longmao.jpg">
     </div>
     <!-- ref表示组件名称，用于直接操作DOM -->
     <el-form ref="loginForm" :rules="rules" :model="form" class='container'>
