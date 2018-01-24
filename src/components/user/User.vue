@@ -179,7 +179,8 @@ export default {
       currentPage: 1, // 当前页码
       pagesize: 5, // 每页显示条数
       total: 0, // 数据总条数
-      tableData: [] // 实际的表格列表数据
+      tableData: [], // 实际的表格列表数据
+      role_name: ''
     }
   },
   methods: {
