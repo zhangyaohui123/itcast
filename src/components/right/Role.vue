@@ -285,7 +285,7 @@ export default {
       } else if (flag === 'edit') {
         this.dialogVisible4Edit = false
       } else {
-        this.dialogVisible4Grand = false
+        this.dialogVisible4Grant = false
       }
     },
     initList () {
