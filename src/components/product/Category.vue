@@ -6,7 +6,7 @@
       <el-breadcrumb-item>分类列表</el-breadcrumb-item>
     </el-breadcrumb>
     <div>
-      <el-button type="success" plain @click='dialogVisible4Add = true'>添加分类</el-button>
+      <el-button type="success" plain @click='addHandler'>添加分类</el-button>
     </div>
     <div>
     <!-- columns表示所有的列  tree-structure 表示数据格式(树形或列表，true树形)  data-source 表示实际的列表数据  deleteCate处理删除操作  showFrom 处理编辑操作  refresh  处理刷新操作-->
@@ -21,14 +21,50 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
+     <!-- 添加分类弹窗 -->
+    <el-dialog
+      title="添加分类"
+      :visible="dialogVisible4Add"
+      @close='closeUserDialog("cate")'
+      width="50%">
+      <div>
+        <span>分类名称：</span>
+        <el-input class='cname' v-model="cate.cat_name"></el-input>
+      </div>
+      <div>
+        <span>父级分类：</span>
+        <el-cascader
+          :options="cateList"
+          v-model="selectedOptions"
+          :props='propsDefine'
+          :show-all-levels="false"
+          @change="handleChange">
+        </el-cascader>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible4Add = false">取 消</el-button>
+        <el-button type="primary" @click="submitCate">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
 import TreeGrid from './TreeGrid.vue'
-import {getCategories} from '../../api/api.js'
+import {getCategories, addCate} from '../../api/api.js'
 export default {
   data () {
     return {
+      propsDefine: {
+        value: 'cat_id',
+        label: 'cat_name'
+      },
+      cateList: [],
+      selectedOptions: [],
+      cate: {
+        cat_name: '',
+        cat_level: '',
+        cat_pid: ''
+      },
       dataSource: [], // 数据源 来自后台
       columns: [{
         text: '分类名称',
@@ -50,6 +86,41 @@ export default {
     }
   },
   methods: {
+    submitCate () {
+      // 加工分类参数数据
+      if (this.selectedOptions.length === 0) {
+        this.cate.cat_pid = 0
+        this.cate.cat_level = 1
+      } else {
+        this.cate.cat_pid = this.selectedOptions[this.selectedOptions.length - 1]
+      }
+      // 提交表单
+      addCate(this.cate).then(res => {
+        if (res.meta.status === 201) {
+          // 刷新列表
+          this.initList()
+          // 关闭窗口
+          this.dialogVisible4Add = false
+          // 提示
+          this.$message({
+            type: 'success',
+            message: res.meta.msg
+          })
+        }
+      })
+    },
+    handleChange () {
+      console.log('handleChange')
+    },
+    addHandler () {
+      // 获取所有的分类列表数据
+      getCategories({type: 2}).then(res => {
+        if (res.meta.status === 200) {
+          this.cateList = res.data
+          this.dialogVisible4Add = true
+        }
+      })
+    },
     deleteCategory () {
       console.log('deleteCategory')
     },
@@ -70,14 +141,24 @@ export default {
       this.initList()
     },
     initList () {
+      // 获取分类列表数据
       getCategories({type: 3, pagenum: this.currentPage, pagesize: this.pagesize}).then(res => {
-        // console.log(res)
         if (res.meta.status === 200) {
           this.dataSource = res.data.result
           this.pagesize = res.data.pagesize
           this.total = res.data.total
         }
       })
+    },
+    closeUserDialog (flag) {
+      // 关闭添加用户弹窗
+      if (flag === 'cate') {
+        this.dialogVisible4Add = false
+      } else if (flag === 'edit') {
+        this.dialogVisible4Edit = false
+      } else {
+        this.dialogVisible4Role = false
+      }
     }
   },
   components: {
@@ -100,5 +181,8 @@ export default {
     padding-top: 10px;
     height: 35px;
     line-height: 35px;
+  }
+  .cname {
+    width: 67%;
   }
 </style>
