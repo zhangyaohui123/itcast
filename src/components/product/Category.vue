@@ -10,7 +10,7 @@
     </div>
     <div>
     <!-- columns表示所有的列  tree-structure 表示数据格式(树形或列表，true树形)  data-source 表示实际的列表数据  deleteCate处理删除操作  showFrom 处理编辑操作  refresh  处理刷新操作-->
-    <tree-grid :columns="columns" :tree-structure="true" :data-source="dataSource" @deleteCate="deleteCategory" @showFrom="showEditFrom" @refresh="initList"></tree-grid>
+    <tree-grid :columns="columns" :tree-structure="true" :data-source="dataSource" @deleteCate="deleteCategory" @showForm="showEditFrom" @refresh="initList"></tree-grid>
     </div>
     <el-pagination
       @size-change="handleSizeChange"
@@ -46,20 +46,50 @@
         <el-button type="primary" @click="submitCate">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 添加编辑分类弹窗 -->
+    <el-dialog
+      title="编辑分类"
+      :visible="dialogVisible4Edit"
+      @close='closeUserDialog("edit")'
+      width="50%">
+      <div>
+        <span>分类名称：</span>
+        <el-input class='cname' v-model="ecate.cat_name"></el-input>
+      </div>
+      <div>
+        <span>父级分类：</span>
+        <el-cascader
+          :options="ecateList"
+          v-model="eselectedOptions"
+          :props='propsDefine'>
+        </el-cascader>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible4Edit = false">取 消</el-button>
+        <el-button type="primary" @click="submitCate4Edit">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
 import TreeGrid from './TreeGrid.vue'
-import {getCategories, addCate} from '../../api/api.js'
+import {getCategories, addCate, getCateById, editCate} from '../../api/api.js'
 export default {
   data () {
     return {
+      ecate: {
+        cat_name: '',
+        cat_level: '',
+        cat_pid: ''
+      },
       propsDefine: {
         value: 'cat_id',
         label: 'cat_name'
       },
       cateList: [],
+      ecateList: [],
       selectedOptions: [],
+      eselectedOptions: [],
       cate: {
         cat_name: '',
         cat_level: '',
@@ -80,6 +110,7 @@ export default {
         width: 100
       }],
       dialogVisible4Add: false,
+      dialogVisible4Edit: false,
       currentPage: 1,
       pagesize: 5,
       total: 10
@@ -93,6 +124,8 @@ export default {
         this.cate.cat_level = 1
       } else {
         this.cate.cat_pid = this.selectedOptions[this.selectedOptions.length - 1]
+        // 设置层级
+        this.cate.cat_level = this.selectedOptions.length === 1 ? 2 : 3
       }
       // 提交表单
       addCate(this.cate).then(res => {
@@ -124,8 +157,35 @@ export default {
     deleteCategory () {
       console.log('deleteCategory')
     },
-    showEditFrom () {
-      console.log('showEditFrom')
+    submitCate4Edit () {
+      editCate(this.ecate).then(res => {
+        if (res.meta.status === 200) {
+          this.initList()
+          this.dialogVisible4Edit = false
+          this.$message({
+            type: 'success',
+            message: res.meta.msg
+          })
+        }
+      })
+    },
+    showEditFrom (cid) {
+      // 获取分类下拉列表数据
+      getCategories().then(res => {
+        if (res.meta.status === 200) {
+          this.ecateList = res.data
+          // 获取数据后调用获取分类信息接口
+          return getCateById({id: cid})
+        }
+      }).then(res => {
+        if (res.meta.status === 200) {
+          // 把数据填充到表单中
+          this.ecate.cat_pid = res.data.cat_id
+          this.ecate.cat_name = res.data.cat_name
+          this.ecate.cat_level = res.data.cat_level
+          this.dialogVisible4Edit = true
+        }
+      })
     },
     refresh () {
       console.log('refresh')
